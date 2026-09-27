@@ -113,50 +113,73 @@
   </div>
 </section>
 
-<!-- ESTOQUE + FILTROS (layout Viggo) -->
-<main class="container estoque-wrap" id="estoque">
+<!-- ESTOQUE - FORMATO PRINT VIGGO -->
+<main class="container" id="estoque" style="padding:18px 16px">
+  <!-- Barra superior pesquisar + ordenar (igual print) -->
+  <div class="search-top">
+    <div class="search-top-row">
+      <input type="text" id="fBuscaTop" placeholder="Pesquisar Veículos">
+      <button class="btn-red" id="btnBuscarTop" type="button">Buscar</button>
+    </div>
+    <div class="search-top-sub">
+      <span id="countTxt">Exibindo: 12 de 12 Veículos disponíveis</span>
+      <label style="margin-left:auto">Ordenar por:
+        <select id="fOrdem"><option value="recente">Mais Recente</option><option value="menor">Menor Valor</option><option value="maior">Maior Valor</option><option value="menorkm">Menor Km</option><option value="anoNovo">Ano Mais Novo</option></select>
+      </label>
+    </div>
+  </div>
+
+  <div class="estoque-wrap" style="padding:14px 0">
   <aside class="filters">
     <div class="filter-box">
-      <h3>FILTROS <button id="clearFilters" class="link">Limpar Filtros</button></h3>
+      <h3>FILTROS <button id="clearFilters" class="link" type="button">Limpar Filtros</button></h3>
       <label>Código de Referência</label>
-      <input type="text" id="fCodigo" placeholder="Ex: 3085">
-      <label>Buscar</label>
-      <input type="text" id="fBusca" placeholder="Modelo, versão...">
-      <button class="btn-red full" id="btnBuscar" type="button" style="margin-top:8px">🔍 Buscar</button>
+      <div style="display:flex;gap:6px"><input type="text" id="fCodigo" placeholder="Buscar por código" style="flex:1"><button class="btn-red" id="btnCod" type="button" style="padding:11px 13px">⌕</button></div>
+      <label class="check"><input type="radio" name="sup" id="fSuper"> Super Oferta</label>
       <label>Estado</label>
-      <div class="chips" id="fEstado">
-        <button data-v="todos" class="on">Todos</button>
-        <button data-v="Semi-novo">Semi-novo</button>
-        <button data-v="Usado">Usado</button>
-      </div>
-      <label>Marca</label>
+      <label class="check"><input type="checkbox" class="fEst" value="Zero Km"> Zero Km</label>
+      <label class="check"><input type="checkbox" class="fEst" value="Semi-novo" checked> Semi-novo</label>
+      <label class="check"><input type="checkbox" class="fEst" value="Usado" checked> Usado</label>
+      <label>Marcas</label>
       <select id="fMarca"><option value="todas">Mostrar Todas</option></select>
-      <label>Valor até: <strong id="valLabel">R$ 130 mil</strong></label>
-      <input type="range" id="fValor" min="30000" max="130000" step="5000" value="130000">
+      <label>Modelos</label>
+      <select id="fModelo"><option value="todos">Mostrar Todos</option></select>
+      <label>Versão</label>
+      <select id="fVersao"><option value="todas">Mostrar Todas</option><option>1.0</option><option>1.6</option><option>1.8</option><option>2.0</option></select>
+      <label>Valor</label>
+      <input type="range" id="fValor" min="0" max="129000" step="1000" value="129000">
+      <small id="valLabel">R$ 0 – R$ 129.000</small>
+      <label>Quilometragem</label>
+      <input type="range" id="fKm" min="0" max="189000" step="5000" value="189000">
+      <small id="kmLabel">0Km – 189.000Km</small>
       <label>Câmbio</label>
       <select id="fCambio"><option value="todos">Todos os Câmbios</option><option>Manual</option><option>Automático</option></select>
       <label>Combustível</label>
-      <select id="fComb"><option value="todos">Todos</option><option>Flex</option><option>Gasolina</option><option>Diesel</option></select>
+      <select id="fComb"><option value="todos">Todos os Combustíveis</option><option>Flex</option><option>Gasolina</option><option>Diesel</option></select>
+      <label>Carroceria</label>
+      <select id="fCarro"><option value="todas">Todas as Carrocerias</option><option>Hatchback</option><option>Sedan</option><option>SUV</option><option>Pickup</option></select>
+      <label>Etiqueta</label>
+      <label class="check"><input type="checkbox" class="fEtiq" value="Raridade"> Raridade</label>
+      <label class="check"><input type="checkbox" class="fEtiq" value="Segundo Dono"> Segundo Dono</label>
+      <label class="check"><input type="checkbox" class="fEtiq" value="Super Novo"> Super Novo</label>
+      <label class="check"><input type="checkbox" class="fEtiq" value="Único Dono"> Único Dono</label>
       <label class="check"><input type="checkbox" id="fFav"> ❤ Somente favoritos</label>
+      <input type="hidden" id="fBusca"><input type="hidden" id="fModeloHidden">
+      <button class="btn-red full" id="btnBuscar" type="button" style="margin-top:10px">🔍 Buscar</button>
+      <button class="btn-outline full" id="btnLimparTopo" type="button" style="margin-top:8px">Limpar</button>
     </div>
     <div class="filter-box dark">
       <h4>💰 Simule seu financiamento</h4>
       <p>Entrada + parcelas que cabem no bolso.</p>
-      <button class="btn-red full" id="openSimulador2">Simular agora</button>
+      <button class="btn-red full" id="openSimulador2" type="button">Simular agora</button>
+      <a class="big-btn wa pulse-wa" target="_blank" href="https://wa.me/555432296789?text=Ol%C3%A1!%20Quero%20uma%20oferta%20da%20BR%20Car." style="margin-top:10px">WhatsApp da loja</a>
     </div>
   </aside>
 
   <section class="grid-area">
-    <div class="toolbar">
-      <div><strong id="countTxt">Exibindo: 12</strong><small> de <span id="totalTxt">12</span> veículos disponíveis</small></div>
-      <div class="toolbar-right">
-        <label>Ordenar por:</label>
-        <select id="fOrdem"><option value="recente">Mais Recente</option><option value="menor">Menor Valor</option><option value="maior">Maior Valor</option><option value="menorkm">Menor Km</option></select>
-        <button class="btn-red" id="btnLimparTopo" type="button">Limpar</button>
-      </div>
-    </div>
-    <div class="grid" id="vehicleGrid"></div>
+    <div class="grid grid-print" id="vehicleGrid"></div>
   </section>
+  </div>
 </main>
 
 <!-- DESTAQUES -->
@@ -260,7 +283,7 @@
   <div class="copy">2026 © BR Car Multimarcas. Todos os direitos reservados. • <a class="dev" target="_blank" href="https://wa.me/5554984074067?text=Oi%2C%20vim%20pelo%20site%20da%20BR%20Car%20Multimarcas%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20para%20a%20cria%C3%A7%C3%A3o%20do%20meu%20site%20pr%C3%B3prio.">Site criado por William Schmitt</a></div>
 </footer>
 
-<a class="float-wa" target="_blank" href="https://wa.me/555432296789?text=Ol%C3%A1!%20Quero%20ver%20as%20ofertas%20da%20BR%20Car.">💬</a>
+<a class="float-wa pulse-wa" target="_blank" href="https://wa.me/555432296789?text=Ol%C3%A1!%20Quero%20ver%20as%20ofertas%20da%20BR%20Car." aria-label="WhatsApp"><svg viewBox="0 0 448 512"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg> WhatsApp</a>
 
 <!-- MODAL SIMULADOR -->
 <div class="overlay" id="ovSim">
