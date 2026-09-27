@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BR Car Multimarcas – Garagem de carros em Caxias do Sul</title>
+<meta name="description" content="BR Car Multimarcas | Garagem de carros em Caxias do Sul. Veículos selecionados, procedência e as melhores condições na BR-116, 13205 - Jardim Eldorado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23e2060e'/><text x='50' y='66' font-size='48' font-family='Arial' font-weight='900' fill='white' text-anchor='middle'>BR</text></svg>">
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="container topbar-inner">
+    <span>📍 BR-116, 13205 - Jardim Eldorado, Caxias do Sul - RS</span>
+    <span class="topbar-right">⏰ Seg a Sex 08:30–18:30 · Sáb 08:30–16:00 &nbsp;|&nbsp; 📞 (54) 3229-6789</span>
+  </div>
+</div>
+
+<!-- HEADER (idêntico Viggo) -->
+<header class="header" id="topo">
+  <div class="container header-inner">
+    <a href="#topo" class="logo">
+      <div class="logo-badge">BR</div>
+      <div class="logo-text"><strong>BR CAR</strong><small>MULTIMARCAS • DESDE 2008</small></div>
+    </a>
+    <nav class="nav" id="navMenu">
+      <a href="#topo" class="active">Home</a>
+      <div class="dropdown">
+        <a href="#estoque" class="drop-btn">Marcas ▾</a>
+        <div class="drop-list" id="dropMarcas"></div>
+      </div>
+      <a href="#sobre">Sobre Nós</a>
+      <a href="#estoque" id="linkFavs">Meus Favoritos <span class="fav-count" id="favCount">0</span></a>
+      <a href="#" id="openSimulador">Simulador de Financiamento</a>
+      <a href="#localizacao">Localização</a>
+    </nav>
+    <div class="header-actions">
+      <a class="icon-btn" href="https://wa.me/555432296789?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20BR%20Car%20Multimarcas%20e%20quero%20ver%20as%20ofertas." target="_blank" aria-label="WhatsApp">✆</a>
+      <a class="icon-btn" href="tel:+555432296789" aria-label="Ligar">☎</a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">☰</button>
+    </div>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="#topo">Home</a>
+    <a href="#estoque">Estoque</a>
+    <a href="#sobre">Sobre Nós</a>
+    <a href="#avaliacoes">Avaliações</a>
+    <a href="#" id="openSimuladorM">Simulador de Financiamento</a>
+    <a href="#localizacao">Localização</a>
+    <a href="https://wa.me/555432296789" target="_blank" class="btn-red">Chamar no WhatsApp</a>
+  </div>
+</header>
+
+<!-- HERO / BANNER (slider estilo Viggo) -->
+<section class="hero">
+  <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1600&q=80')">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content reveal">
+      <span class="pill">🚗 Garagem de carros • Caxias do Sul</span>
+      <h1>MAIS DE <span>50 VEÍCULOS</span><br>SELECIONADOS PARA VOCÊ</h1>
+      <p>Tradição, confiança e procedência. Saia de carro novo hoje mesmo com as melhores condições da região.</p>
+      <div class="hero-btns">
+        <a href="#estoque" class="btn-red">Ver estoque</a>
+        <a href="https://wa.me/555432296789?text=Ol%C3%A1!%20Quero%20falar%20com%20um%20vendedor%20da%20BR%20Car." target="_blank" class="btn-white">📲 Falar com vendedor</a>
+      </div>
+      <div class="hero-stats">
+        <div><strong>4,4 ★</strong><small>79 avaliações no Google</small></div>
+        <div><strong>BR-116</strong><small>Jardim Eldorado</small></div>
+        <div><strong>Aprovado</strong><small>Financiamento facilitado</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARCAS POPULARES -->
+<section class="brands">
+  <div class="container">
+    <div class="section-head"><h2>Marcas Populares</h2><a href="#estoque">Ver todas →</a></div>
+    <div class="brands-row" id="brandsRow"></div>
+  </div>
+</section>
+
+<!-- ESTOQUE + FILTROS (layout Viggo) -->
+<main class="container estoque-wrap" id="estoque">
+  <aside class="filters">
+    <div class="filter-box">
+      <h3>FILTROS <button id="clearFilters" class="link">Limpar Filtros</button></h3>
+      <label>Código de Referência</label>
+      <input type="text" id="fCodigo" placeholder="Ex: 3085">
+      <label>Buscar</label>
+      <input type="text" id="fBusca" placeholder="Modelo, versão...">
+      <label>Estado</label>
+      <div class="chips" id="fEstado">
+        <button data-v="todos" class="on">Todos</button>
+        <button data-v="Semi-novo">Semi-novo</button>
+        <button data-v="Usado">Usado</button>
+      </div>
+      <label>Marca</label>
+      <select id="fMarca"><option value="todas">Mostrar Todas</option></select>
+      <label>Valor até: <strong id="valLabel">R$ 130 mil</strong></label>
+      <input type="range" id="fValor" min="30000" max="130000" step="5000" value="130000">
+      <label>Câmbio</label>
+      <select id="fCambio"><option value="todos">Todos os Câmbios</option><option>Manual</option><option>Automático</option></select>
+      <label>Combustível</label>
+      <select id="fComb"><option value="todos">Todos</option><option>Flex</option><option>Gasolina</option><option>Diesel</option></select>
+      <label class="check"><input type="checkbox" id="fFav"> ❤ Somente favoritos</label>
+    </div>
+    <div class="filter-box dark">
+      <h4>💰 Simule seu financiamento</h4>
+      <p>Entrada + parcelas que cabem no bolso.</p>
+      <button class="btn-red full" id="openSimulador2">Simular agora</button>
+    </div>
+  </aside>
+
+  <section class="grid-area">
+    <div class="toolbar">
+      <div><strong id="countTxt">Exibindo: 12</strong><small> de <span id="totalTxt">12</span> veículos disponíveis</small></div>
+      <div class="toolbar-right">
+        <label>Ordenar por:</label>
+        <select id="fOrdem"><option value="recente">Mais Recente</option><option value="menor">Menor Valor</option><option value="maior">Maior Valor</option><option value="menorkm">Menor Km</option></select>
+      </div>
+    </div>
+    <div class="grid" id="vehicleGrid"></div>
+  </section>
+</main>
+
+<!-- DESTAQUES -->
+<section class="destaques">
+  <div class="container">
+    <div class="section-head"><h2>Veículos em Destaque</h2></div>
+    <div class="grid" id="destaqueGrid"></div>
+  </div>
+</section>
+
+<!-- QUEM SOMOS (idêntico Viggo) -->
+<section class="sobre" id="sobre">
+  <div class="container sobre-inner">
+    <div class="reveal">
+      <h4>QUEM SOMOS NÓS?</h4>
+      <h2>BR CAR MULTIMARCAS</h2>
+      <p>Desde 2008 transformando conquistas em realidade!</p>
+      <p>Na <strong>BR Car Multimarcas</strong> você encontra mais de <strong>50 veículos selecionados</strong>, com tradição, confiança e procedência. Somos referência no ramo automotivo em Caxias do Sul.</p>
+      <p>Condições especiais e atendimento de alto padrão em cada detalhe.</p>
+      <p><strong>Venha conhecer de perto e saia de carro novo.</strong></p>
+      <div class="sobre-btns">
+        <a class="btn-red" href="https://wa.me/555432296789?text=Ol%C3%A1!%20Quero%20conhecer%20o%20estoque%20da%20BR%20Car." target="_blank">Agendar visita</a>
+        <a class="btn-outline" href="#localizacao">Como chegar</a>
+      </div>
+    </div>
+    <div class="sobre-img reveal">
+      <img src="https://images.unsplash.com/photo-1562141961-b5d0864b8d0f?auto=format&fit=crop&w=900&q=80" alt="Loja BR Car Multimarcas">
+      <div class="sobre-card">⭐ 4,4 no Google<br><small>79 avaliações de clientes</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- AVALIAÇÕES -->
+<section class="avaliacoes" id="avaliacoes">
+  <div class="container">
+    <div class="section-head"><h2>O que dizem nossos clientes</h2><span class="rating">4,4 ★★★★☆ (79)</span></div>
+    <div class="rev-grid">
+      <div class="rev reveal"><p>"Pessoal gente boa demais, amplo estoque de veículos sempre se renovando."</p><strong>— João Batista Boeira</strong><small>Google • há 6 meses</small></div>
+      <div class="rev reveal"><p>"Ótimo atendimento!! Sou de fora do estado e o vendedor foi super prestativo nas informações e na ajuda."</p><strong>— Lara Gubiani</strong><small>Google • há 11 meses</small></div>
+      <div class="rev reveal"><p>"Excelente loja, ótimo atendimento, profissionais qualificados 👏👏👏"</p><strong>— Avaliação Google</strong><small>Vendedores atenciosos e educados</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCALIZAÇÃO + CONTATO + HORÁRIOS -->
+<section class="loc" id="localizacao">
+  <div class="container loc-inner">
+    <div class="reveal">
+      <h2>Localização</h2>
+      <p><strong>BR Car Multimarcas | Garagem de carros Caxias do Sul</strong><br>BR-116, 13205 - Jardim Eldorado, Caxias do Sul - RS, 95059-520</p>
+      <div class="map">
+        <iframe title="Mapa BR Car" loading="lazy" src="https://www.google.com/maps?q=BR-116,+13205+-+Jardim+Eldorado,+Caxias+do+Sul+-+RS,+95059-520&output=embed"></iframe>
+      </div>
+      <a class="btn-red" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Br+Car+Multimarcas+Caxias+do+Sul+BR-116+13205">Abrir no Google Maps</a>
+    </div>
+    <div class="contact-card reveal">
+      <h3>Fale conosco</h3>
+      <a class="big-btn wa" target="_blank" href="https://wa.me/555432296789?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20uma%20oferta.">📲 WhatsApp • (54) 3229-6789</a>
+      <a class="big-btn" href="tel:+555432296789">📞 Ligar • (54) 3229-6789</a>
+      <a class="big-btn" target="_blank" href="https://brcarmultimarcas.com.br">🌐 brcarmultimarcas.com.br</a>
+      <div class="hours">
+        <h4>Horários de atendimento</h4>
+        <div><span>Segunda a Sexta</span><strong>08:30 – 18:30</strong></div>
+        <div><span>Sábado</span><strong>08:30 – 16:00</strong></div>
+        <div class="closed"><span>Domingo e Feriados</span><strong>Fechado</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER (padrão Viggo + crédito William) -->
+<footer>
+  <div class="container foot-grid">
+    <div>
+      <div class="logo"><div class="logo-badge">BR</div><div class="logo-text"><strong>BR CAR</strong><small>MULTIMARCAS</small></div></div>
+      <p>Lojas de Veículos<br>Todos os direitos reservados</p>
+      <div class="social">
+        <a target="_blank" href="https://www.google.com/maps/search/?api=1&query=Br+Car+Multimarcas+Caxias+do+Sul">G</a>
+        <a target="_blank" href="https://wa.me/555432296789">W</a>
+        <a href="tel:+555432296789">T</a>
+      </div>
+    </div>
+    <div>
+      <h4>Contato</h4>
+      <p>📍 BR-116, 13205<br>Jardim Eldorado – Caxias do Sul/RS</p>
+      <p>📞 (54) 3229-6789</p>
+      <p>🌐 brcarmultimarcas.com.br</p>
+    </div>
+    <div>
+      <h4>Horários</h4>
+      <p>Segunda a Sexta: 08:30 – 18:30</p>
+      <p>Sábados: 08:30 – 16:00</p>
+      <p>Domingos e Feriados: Fechado</p>
+    </div>
+  </div>
+  <div class="copy">2026 © BR Car Multimarcas. Todos os direitos reservados. • <a class="dev" target="_blank" href="https://wa.me/5554984074067?text=Oi%2C%20vim%20pelo%20site%20da%20BR%20Car%20Multimarcas%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20para%20a%20cria%C3%A7%C3%A3o%20do%20meu%20site%20pr%C3%B3prio.">Site criado por William Schmitt</a></div>
+</footer>
+
+<a class="float-wa" target="_blank" href="https://wa.me/555432296789?text=Ol%C3%A1!%20Quero%20ver%20as%20ofertas%20da%20BR%20Car.">💬</a>
+
+<!-- MODAL SIMULADOR -->
+<div class="overlay" id="ovSim">
+  <div class="modal">
+    <button class="close" data-close>×</button>
+    <h3>Simulador de Financiamento</h3>
+    <label>Valor do veículo (R$)</label><input type="number" id="sValor" value="58900">
+    <label>Entrada (R$)</label><input type="number" id="sEntrada" value="15000">
+    <label>Parcelas</label>
+    <select id="sN"><option>12</option><option>24</option><option selected>36</option><option>48</option><option>60</option></select>
+    <button class="btn-red full" id="sCalc">Calcular</button>
+    <div class="sim-res" id="sRes">Escolha os valores e clique em calcular.</div>
+    <a class="btn-red full" target="_blank" id="sWa" href="https://wa.me/555432296789">Enviar simulação no WhatsApp</a>
+  </div>
+</div>
+
+<!-- MODAL DETALHES -->
+<div class="overlay" id="ovDet">
+  <div class="modal wide">
+    <button class="close" data-close>×</button>
+    <div id="detBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
