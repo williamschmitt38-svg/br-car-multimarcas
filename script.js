@@ -14,7 +14,8 @@ const vehicles=[
 {code:"4205",brand:"Chevrolet",model:"Onix",version:"1.0 LT 8V",price:54900,year:2017,km:101000,fuel:"Flex",gear:"Manual",state:"Semi-novo",tag:"",img:"https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=800&q=80"}
 ];
 const brands=["Fiat","Hyundai","Nissan","Peugeot","Honda","Citroen","Renault","Volkswagen","Ford","Chevrolet","Jeep","Toyota"];
-const icons={Fiat:"🚗",Hyundai:"🚙",Nissan:"🏎️",Peugeot:"🦁",Honda:"🔴",Citroen:"⚙️",Renault:"💎",Volkswagen:"🚐",Ford:"🔵",Chevrolet:"➕",Jeep:"🧭",Toyota:"⛰️"};
+const brandDomains={Fiat:"fiat.com",Hyundai:"hyundai.com",Nissan:"nissan-global.com",Peugeot:"peugeot.com",Honda:"honda.com",Citroen:"citroen.com",Renault:"renault.com",Volkswagen:"vw.com",Ford:"ford.com",Chevrolet:"chevrolet.com",Jeep:"jeep.com",Toyota:"toyota.com"};
+const logoURL=b=>`https://logo.clearbit.com/${brandDomains[b]}?size=128`;
 let favs=new Set(JSON.parse(localStorage.getItem("brcar_favs")||"[]"));
 let estadoFiltro="todos";
 
@@ -24,25 +25,26 @@ const fmt=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL",maximumFr
 function toast(m){const t=$("toast");t.textContent=m;t.style.display="block";clearTimeout(t._x);t._x=setTimeout(()=>t.style.display="none",2600)}
 
 function renderBrands(){
-  $("brandsRow").innerHTML=brands.map(b=>`<div class="brand-chip" data-b="${b}"><span>${icons[b]||"🚗"}</span>${b}</div>`).join("");
-  document.querySelectorAll(".brand-chip").forEach(c=>c.onclick=()=>{$("fMarca").value=c.dataset.b;applyFilters();document.getElementById("estoque").scrollIntoView({behavior:"smooth"})});
+  $("brandsRow").innerHTML=brands.map(b=>`<div class="brand-chip" data-b="${b}" role="button" tabindex="0" title="Filtrar ${b}"><img loading="lazy" src="${logoURL(b)}" alt="Logo ${b}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="fallback">${b[0]}</span>${b}</div>`).join("");
+  const filterBy=b=>{$("fMarca").value=b;document.querySelectorAll(".brand-chip").forEach(x=>x.classList.toggle("on",x.dataset.b===b));applyFilters();document.getElementById("estoque").scrollIntoView({behavior:"smooth"});toast("Filtrando: "+b)};
+  document.querySelectorAll(".brand-chip").forEach(c=>{c.onclick=()=>filterBy(c.dataset.b);c.onkeydown=e=>{if(e.key==="Enter")filterBy(c.dataset.b)}});
   $("dropMarcas").innerHTML=brands.map(b=>`<a href="#estoque" data-b="${b}">${b}</a>`).join("");
-  document.querySelectorAll("#dropMarcas a").forEach(a=>a.onclick=()=>{$("fMarca").value=a.dataset.b;applyFilters()});
-  const sel=$("fMarca");brands.forEach(b=>{const o=document.createElement("option");o.textContent=b;sel.appendChild(o)});
+  document.querySelectorAll("#dropMarcas a").forEach(a=>a.onclick=e=>{e.preventDefault();$("fMarca").value=a.dataset.b;applyFilters();document.getElementById("estoque").scrollIntoView({behavior:"smooth"})});
+  const sel=$("fMarca");sel.innerHTML='<option value="todas">Mostrar Todas</option>';brands.forEach(b=>{const o=document.createElement("option");o.textContent=b;sel.appendChild(o)});
 }
 
 function card(v){
   const isFav=favs.has(v.code);
   return `<div class="card">
-   <div class="card-img"><img loading="lazy" src="${v.img}" alt="${v.brand} ${v.model}">
+   <div class="card-img" data-det-img="${v.code}"><img loading="lazy" src="${v.img}" alt="${v.brand} ${v.model}">
    <span class="badge ${v.tag?"oferta":""}">${v.state}</span>
-   <button class="fav ${isFav?"on":""}" data-fav="${v.code}">${isFav?"❤":"♡"}</button></div>
+   <button class="fav ${isFav?"on":""}" data-fav="${v.code}" aria-label="Favoritar"> ${isFav?"❤":"♡"}</button></div>
    <div class="card-body"><span class="code">Código: ${v.code} ${v.tag?"• "+v.tag:""}</span>
    <h3>${v.brand} ${v.model}<br><span style="font-weight:600;font-size:13px">${v.version}</span></h3>
    <div class="price">${fmt(v.price)}</div>
    <div class="meta"><span>📅 ${v.year}</span><span>🛣️ ${v.km.toLocaleString("pt-BR")} Km</span></div>
    <div class="meta"><span>⛽ ${v.fuel}</span><span>⚙️ ${v.gear}</span></div>
-   <div class="card-foot"><button class="btn-det" data-det="${v.code}">Ver Detalhes</button>
+   <div class="card-foot"><button class="btn-det" data-det="${v.code}" type="button">Ver Detalhes</button>
    <a class="btn-wa" target="_blank" href="https://wa.me/${WA}?text=${encodeURIComponent("Olá! Quero agendar uma visita para ver o "+v.brand+" "+v.model+" "+v.version+" ("+v.year+") código "+v.code+" de "+fmt(v.price)+".")}">WhatsApp</a></div>
    </div></div>`;
 }
@@ -78,6 +80,7 @@ function bindCards(){
   document.querySelectorAll("[data-fav]").forEach(b=>b.onclick=e=>{e.stopPropagation();const c=b.dataset.fav;
     favs.has(c)?favs.delete(c):favs.add(c);localStorage.setItem("brcar_favs",JSON.stringify([...favs]));applyFilters();toast(favs.has(c)?"Adicionado aos favoritos ❤":"Removido dos favoritos")});
   document.querySelectorAll("[data-det]").forEach(b=>b.onclick=()=>openDet(b.dataset.det));
+  document.querySelectorAll("[data-det-img]").forEach(d=>d.onclick=e=>{if(e.target.closest("[data-fav]"))return;openDet(d.dataset.detImg)});
 }
 function openDet(code){
   const v=vehicles.find(x=>x.code===code);if(!v)return;
@@ -91,15 +94,41 @@ function openDet(code){
 }
 // eventos filtros
 ["fCodigo","fBusca","fMarca","fValor","fCambio","fComb","fOrdem","fFav"].forEach(id=>$(id).addEventListener("input",applyFilters));
+$("fBusca").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();applyFilters();toast("Busca aplicada")}}); 
+const clearAll=()=>{$("fCodigo").value="";$("fBusca").value="";$("fMarca").value="todas";$("fValor").value=130000;$("fCambio").value="todos";$("fComb").value="todos";$("fFav").checked=false;estadoFiltro="todos";document.querySelectorAll("#fEstado button").forEach((x,i)=>x.classList.toggle("on",i===0));document.querySelectorAll(".brand-chip").forEach(x=>x.classList.remove("on"));applyFilters();toast("Filtros limpos")};
+$("clearFilters").onclick=clearAll;
+const btnTopo=$("btnLimparTopo");if(btnTopo)btnTopo.onclick=clearAll;
+const btnBuscar=$("btnBuscar");if(btnBuscar)btnBuscar.onclick=()=>{applyFilters();document.getElementById("vehicleGrid").scrollIntoView({behavior:"smooth",block:"start"});toast("Busca aplicada")};
+const verTodas=$("verTodasMarcas");if(verTodas)verTodas.onclick=e=>{e.preventDefault();clearAll();document.getElementById("estoque").scrollIntoView({behavior:"smooth"})};
 document.querySelectorAll("#fEstado button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#fEstado button").forEach(x=>x.classList.remove("on"));b.classList.add("on");estadoFiltro=b.dataset.v;applyFilters()});
-$("clearFilters").onclick=()=>{$("fCodigo").value="";$("fBusca").value="";$("fMarca").value="todas";$("fValor").value=130000;$("fCambio").value="todos";$("fComb").value="todos";$("fFav").checked=false;estadoFiltro="todos";document.querySelectorAll("#fEstado button").forEach((x,i)=>x.classList.toggle("on",i===0));applyFilters()};
-$("linkFavs").onclick=()=>{$("fFav").checked=true;applyFilters()};
+$("linkFavs").onclick=e=>{e.preventDefault();$("fFav").checked=true;applyFilters();document.getElementById("estoque").scrollIntoView({behavior:"smooth"});toast(favs.size?favs.size+" favorito(s)":"Você ainda não tem favoritos — clique no ♡")};
 // menu mobile
 $("menuToggle").onclick=()=>$("mobileNav").classList.toggle("open");
 document.querySelectorAll("#mobileNav a").forEach(a=>a.addEventListener("click",()=>$("mobileNav").classList.remove("open")));
 // modais
 const openSim=()=>{$("ovSim").classList.add("open");document.body.style.overflow="hidden"};
-["openSimulador","openSimulador2","openSimuladorM"].forEach(id=>{const el=$(id);if(el)el.onclick=e=>{e.preventDefault();$("mobileNav").classList.remove("open");openSim()}});
+["openSimulador","openSimulador2","openSimuladorM","heroSimular"].forEach(id=>{const el=$(id);if(el)el.onclick=e=>{e.preventDefault();const m=$("mobileNav");if(m)m.classList.remove("open");openSim()}});
+// scroll suave p/ todos âncoras + dropdown touch
+document.querySelectorAll('a[href^="#"]').forEach(a=>{if(a.getAttribute("href").length>1&&!a.id.startsWith("open"))a.addEventListener("click",e=>{const t=document.querySelector(a.getAttribute("href"));if(t){e.preventDefault();t.scrollIntoView({behavior:"smooth"});const m=$("mobileNav");if(m)m.classList.remove("open")}})});
+const dropBtn=document.querySelector(".drop-btn");if(dropBtn)dropBtn.addEventListener("click",e=>{if(window.innerWidth<960){e.preventDefault();const l=document.querySelector(".drop-list");l.style.display=l.style.display==="block"?"none":"block"}});
+// HERO SLIDER clicável estilo Viggo
+let heroIdx=0,heroTimer=null;
+function heroShow(i){
+  const slides=document.querySelectorAll(".hero-slide");if(!slides.length)return;
+  heroIdx=(i+slides.length)%slides.length;
+  slides.forEach((s,k)=>s.classList.toggle("active",k===heroIdx));
+  const dots=document.querySelectorAll("#heroDots button");dots.forEach((d,k)=>d.classList.toggle("on",k===heroIdx));
+}
+function heroAuto(){clearInterval(heroTimer);heroTimer=setInterval(()=>heroShow(heroIdx+1),5000)}
+(function initHero(){
+  const slides=document.querySelectorAll(".hero-slide"),dotsBox=$("heroDots");if(!slides.length||!dotsBox)return;
+  dotsBox.innerHTML=[...slides].map((_,i)=>`<button aria-label="Slide ${i+1}" data-d="${i}"></button>`).join("");
+  dotsBox.querySelectorAll("button").forEach(d=>d.onclick=()=>{heroShow(+d.dataset.d);heroAuto()});
+  $("heroPrev").onclick=()=>{heroShow(heroIdx-1);heroAuto()};
+  $("heroNext").onclick=()=>{heroShow(heroIdx+1);heroAuto()};
+  const sec=$("heroSlider");sec.addEventListener("mouseenter",()=>clearInterval(heroTimer));sec.addEventListener("mouseleave",heroAuto);
+  heroShow(0);heroAuto();
+})();
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>{b.closest(".overlay").classList.remove("open");document.body.style.overflow=""});
 document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o){o.classList.remove("open");document.body.style.overflow=""}}));
 document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".overlay.open").forEach(o=>{o.classList.remove("open");document.body.style.overflow=""})});
