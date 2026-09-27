@@ -56,16 +56,16 @@
   </div>
 </header>
 
-<!-- HERO / BANNER (slider estilo Viggo) -->
-<section class="hero">
+<!-- HERO / BANNER (slider estilo Viggo - clicável) -->
+<section class="hero" id="heroSlider">
   <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1600&q=80')">
     <div class="hero-overlay"></div>
-    <div class="container hero-content reveal">
+    <div class="container hero-content">
       <span class="pill">🚗 Garagem de carros • Caxias do Sul</span>
       <h1>MAIS DE <span>50 VEÍCULOS</span><br>SELECIONADOS PARA VOCÊ</h1>
       <p>Tradição, confiança e procedência. Saia de carro novo hoje mesmo com as melhores condições da região.</p>
       <div class="hero-btns">
-        <a href="#estoque" class="btn-red">Ver estoque</a>
+        <a href="#estoque" class="btn-red" data-scroll>Ver estoque</a>
         <a href="https://wa.me/555432296789?text=Ol%C3%A1!%20Quero%20falar%20com%20um%20vendedor%20da%20BR%20Car." target="_blank" class="btn-white">📲 Falar com vendedor</a>
       </div>
       <div class="hero-stats">
@@ -75,13 +75,41 @@
       </div>
     </div>
   </div>
+  <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1600&q=80')">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+      <span class="pill">💰 Financiamento facilitado</span>
+      <h1>SIMULE E <span>SAIA DE CARRO NOVO</span><br>HOJE MESMO</h1>
+      <p>Entrada facilitada e parcelas que cabem no bolso. Aprovação rápida no WhatsApp.</p>
+      <div class="hero-btns">
+        <a href="#" class="btn-red" id="heroSimular">Simular financiamento</a>
+        <a href="#estoque" class="btn-white" data-scroll>Ver ofertas</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&q=80')">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+      <span class="pill">📍 BR-116, 13205 • Jardim Eldorado</span>
+      <h1>VISITE NOSSA <span>GARAGEM</span><br>EM CAXIAS DO SUL</h1>
+      <p>Amplo estoque se renovando toda semana. Seg a Sex 08:30–18:30 • Sáb 08:30–16:00.</p>
+      <div class="hero-btns">
+        <a href="#localizacao" class="btn-red" data-scroll>Como chegar</a>
+        <a href="tel:+555432296789" class="btn-white">📞 (54) 3229-6789</a>
+      </div>
+    </div>
+  </div>
+  <button class="hero-arrow prev" id="heroPrev" aria-label="Anterior">‹</button>
+  <button class="hero-arrow next" id="heroNext" aria-label="Próximo">›</button>
+  <div class="hero-dots" id="heroDots"></div>
 </section>
 
 <!-- MARCAS POPULARES -->
 <section class="brands">
   <div class="container">
-    <div class="section-head"><h2>Marcas Populares</h2><a href="#estoque">Ver todas →</a></div>
+    <div class="section-head"><h2>Marcas Populares</h2><a href="#estoque" id="verTodasMarcas" data-scroll>Ver todas →</a></div>
     <div class="brands-row" id="brandsRow"></div>
+    <small class="brands-note">Logos oficiais das montadoras • clique para filtrar o estoque</small>
   </div>
 </section>
 
@@ -94,6 +122,7 @@
       <input type="text" id="fCodigo" placeholder="Ex: 3085">
       <label>Buscar</label>
       <input type="text" id="fBusca" placeholder="Modelo, versão...">
+      <button class="btn-red full" id="btnBuscar" type="button" style="margin-top:8px">🔍 Buscar</button>
       <label>Estado</label>
       <div class="chips" id="fEstado">
         <button data-v="todos" class="on">Todos</button>
@@ -123,6 +152,7 @@
       <div class="toolbar-right">
         <label>Ordenar por:</label>
         <select id="fOrdem"><option value="recente">Mais Recente</option><option value="menor">Menor Valor</option><option value="maior">Maior Valor</option><option value="menorkm">Menor Km</option></select>
+        <button class="btn-red" id="btnLimparTopo" type="button">Limpar</button>
       </div>
     </div>
     <div class="grid" id="vehicleGrid"></div>
@@ -132,7 +162,7 @@
 <!-- DESTAQUES -->
 <section class="destaques">
   <div class="container">
-    <div class="section-head"><h2>Veículos em Destaque</h2></div>
+    <div class="section-head"><h2 style="color:#fff">Veículos em Destaque</h2><a href="#estoque" data-scroll style="color:#ff5b60">Ver estoque →</a></div>
     <div class="grid" id="destaqueGrid"></div>
   </div>
 </section>
@@ -167,6 +197,10 @@
       <div class="rev reveal"><p>"Pessoal gente boa demais, amplo estoque de veículos sempre se renovando."</p><strong>— João Batista Boeira</strong><small>Google • há 6 meses</small></div>
       <div class="rev reveal"><p>"Ótimo atendimento!! Sou de fora do estado e o vendedor foi super prestativo nas informações e na ajuda."</p><strong>— Lara Gubiani</strong><small>Google • há 11 meses</small></div>
       <div class="rev reveal"><p>"Excelente loja, ótimo atendimento, profissionais qualificados 👏👏👏"</p><strong>— Avaliação Google</strong><small>Vendedores atenciosos e educados</small></div>
+    </div>
+    <div style="text-align:center;margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <a class="btn-red" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Br+Car+Multimarcas+Caxias+do+Sul">⭐ Ver avaliações no Google</a>
+      <a class="btn-outline" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Br+Car+Multimarcas+Caxias+do+Sul">Avaliar loja</a>
     </div>
   </div>
 </section>
@@ -204,9 +238,10 @@
       <div class="logo"><div class="logo-badge">BR</div><div class="logo-text"><strong>BR CAR</strong><small>MULTIMARCAS</small></div></div>
       <p>Lojas de Veículos<br>Todos os direitos reservados</p>
       <div class="social">
-        <a target="_blank" href="https://www.google.com/maps/search/?api=1&query=Br+Car+Multimarcas+Caxias+do+Sul">G</a>
-        <a target="_blank" href="https://wa.me/555432296789">W</a>
-        <a href="tel:+555432296789">T</a>
+        <a target="_blank" title="Google Maps" aria-label="Google Maps" href="https://www.google.com/maps/search/?api=1&query=Br+Car+Multimarcas+Caxias+do+Sul">G</a>
+        <a target="_blank" title="WhatsApp" aria-label="WhatsApp" href="https://wa.me/555432296789?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20BR%20Car.">W</a>
+        <a title="Ligar" aria-label="Ligar" href="tel:+555432296789">T</a>
+        <a target="_blank" title="Site oficial" aria-label="Site oficial" href="https://brcarmultimarcas.com.br">🌐</a>
       </div>
     </div>
     <div>
