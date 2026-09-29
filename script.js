@@ -28,18 +28,31 @@ const logoURL=b=>`https://logo.clearbit.com/${brandDomains[b]}?size=128`;functio
 let favs=new Set();try{favs=new Set(JSON.parse(localStorage.getItem("brcar_favs")||"[]"))}catch(e){favs=new Set()}
 let estadoFiltro="todos";
 
-const $=id=>document.getElementById(id);
+const $=id=>document.getElementById(id);const val=(id,fb)=>{const el=$(id);return el?(el.value!==undefined?el.value:fb):fb};const num=(id,fb)=>{const v=parseFloat(val(id,""));return isNaN(v)?fb:v};const bool=id=>{const el=$(id);return el?!!el.checked:false};
 const fmt=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0});
 
-function toast(m){const t=$("toast");t.textContent=m;t.style.display="block";clearTimeout(t._x);t._x=setTimeout(()=>t.style.display="none",2600)}
+function toast(m){const t=$("toast");if(!t)return;t.textContent=m;t.style.display="block";clearTimeout(t._x);t._x=setTimeout(()=>t.style.display="none",2600)}
 
 function renderBrands(){
-  $("brandsRow").innerHTML=brands.map(b=>`<div class="brand-chip" data-b="${b}" role="button" tabindex="0" title="Filtrar ${b}"><img loading="lazy" src="${logoURL(b)}" data-slug="${slugOf(b)}" alt="Logo ${b}" onerror="if(!this.dataset.f1){this.dataset.f1=1;this.src='https://cdn.simpleicons.org/'+this.dataset.slug}else{this.style.display='none';this.nextElementSibling.style.display='flex'}"><span class="fallback">${b[0]}</span>${b}</div>`).join("");
-  const filterBy=b=>{$("fMarca").value=b;document.querySelectorAll(".brand-chip").forEach(x=>x.classList.toggle("on",x.dataset.b===b));applyFilters();document.getElementById("estoque").scrollIntoView({behavior:"smooth"});toast("Filtrando: "+b)};
-  document.querySelectorAll(".brand-chip").forEach(c=>{c.onclick=()=>filterBy(c.dataset.b);c.onkeydown=e=>{if(e.key==="Enter")filterBy(c.dataset.b)}});
-  $("dropMarcas").innerHTML=brands.map(b=>`<a href="#estoque" data-b="${b}">${b}</a>`).join("");
-  document.querySelectorAll("#dropMarcas a").forEach(a=>a.onclick=e=>{e.preventDefault();$("fMarca").value=a.dataset.b;applyFilters();document.getElementById("estoque").scrollIntoView({behavior:"smooth"})});
-  const sel=$("fMarca");sel.innerHTML='<option value="todas">Mostrar Todas</option>';brands.forEach(b=>{const o=document.createElement("option");o.textContent=b;sel.appendChild(o)});
+  const br=$("brandsRow");
+  if(br){
+    br.innerHTML=brands.map(b=>`<div class="brand-chip" data-b="${b}" role="button" tabindex="0" title="Filtrar ${b}"><img loading="lazy" src="${logoURL(b)}" data-slug="${slugOf(b)}" alt="Logo ${b}" onerror="if(!this.dataset.f1){this.dataset.f1=1;this.src='https://cdn.simpleicons.org/'+this.dataset.slug}else{this.style.display='none';this.nextElementSibling.style.display='flex'}"><span class="fallback">${b[0]}</span>${b}</div>`).join("");
+    const filterBy=b=>{const fm=$("fMarca");if(fm)fm.value=b;br.querySelectorAll(".brand-chip").forEach(x=>x.classList.toggle("on",x.dataset.b===b));try{applyFilters()}catch(e){}const es=$("estoque");if(es)es.scrollIntoView({behavior:"smooth"});toast("Filtrando: "+b)};
+    br.querySelectorAll(".brand-chip").forEach(c=>{c.onclick=()=>filterBy(c.dataset.b);c.onkeydown=e=>{if(e.key==="Enter")filterBy(c.dataset.b)}});
+  }
+  const dl=$("dropMarcas");
+  if(dl){
+    dl.innerHTML=brands.map(b=>`<a href="#estoque" data-b="${b}">${b}</a>`).join("");
+    dl.querySelectorAll("a").forEach(a=>a.onclick=e=>{e.preventDefault();const fm=$("fMarca");if(fm)fm.value=a.dataset.b;try{applyFilters()}catch(e){}const es=$("estoque");if(es)es.scrollIntoView({behavior:"smooth"})});
+  }
+  const sel=$("fMarca");
+  if(sel){sel.innerHTML='<option value="todas">Mostrar Todas</option>';brands.forEach(b=>{const o=document.createElement("option");o.textContent=b;sel.appendChild(o)});}
+}
+function syncModeloOptions(){
+  const marca=val("fMarca","todas");
+  const modelos=[...new Set(vehicles.filter(v=>marca==="todas"||v.brand===marca).map(v=>v.model))];
+  const sm=$("fModelo");
+  if(sm)sm.innerHTML='<option value="todos">Mostrar Todos</option>'+modelos.map(m=>`<option>${m}</option>`).join("");
 }
 
 function card(v){
@@ -63,13 +76,13 @@ function getFiltros(){
   const ests=[...document.querySelectorAll(".fEst:checked")].map(x=>x.value);
   const etqs=[...document.querySelectorAll(".fEtiq:checked")].map(x=>x.value);
   return {
-    cod:$("fCodigo").value.trim(),
-    busca:(($("fBuscaTop")&&$("fBuscaTop").value)||$("fBusca").value||"").toLowerCase(),
-    marca:$("fMarca").value, modelo:$("fModelo").value, versao:$("fVersao").value,
-    cambio:$("fCambio").value, comb:$("fComb").value, carro:$("fCarro").value,
-    maxV:+$("fValor").value, maxKm:+$("fKm").value,
-    super:$("fSuper").checked, soFav:$("fFav").checked,
-    ests, etqs, ordem:$("fOrdem").value
+    cod:val("fCodigo","").trim(),
+    busca:((val("fBuscaTop","")||val("fBusca",""))+"").toLowerCase(),
+    marca:val("fMarca","todas"), modelo:val("fModelo","todos"), versao:val("fVersao","todas"),
+    cambio:val("fCambio","todos"), comb:val("fComb","todos"), carro:val("fCarro","todas"),
+    maxV:num("fValor",Infinity), maxKm:num("fKm",Infinity),
+    super:bool("fSuper"), soFav:bool("fFav"),
+    ests, etqs, ordem:val("fOrdem","recente")
   };
 }
 function applyFilters(){
@@ -98,12 +111,12 @@ function applyFilters(){
   if(f.ordem==="menorkm")list.sort((a,b)=>a.km-b.km);
   if(f.ordem==="anoNovo")list.sort((a,b)=>b.year-a.year);
   if(f.ordem==="recente")list.sort((a,b)=>b.year-a.year);
-  $("vehicleGrid").innerHTML=list.length?list.map(card).join(""):`<p style="grid-column:1/-1;background:#fff;padding:20px;border-radius:8px">Nenhum veículo encontrado. <button class="link" id="btnEmpty">Limpar filtros</button></p>`;
+  const vg=$("vehicleGrid");if(vg)vg.innerHTML=list.length?list.map(card).join(""):`<p style="grid-column:1/-1;background:#fff;padding:20px;border-radius:8px">Nenhum veículo encontrado. <button class="link" id="btnEmpty">Limpar filtros</button></p>`;
   const be=$("btnEmpty");if(be)be.onclick=()=>clearAll();
-  $("countTxt").textContent=`Exibindo: ${list.length} de ${vehicles.length} Veículos disponíveis`;
-  $("destaqueGrid").innerHTML=vehicles.filter(x=>x.super).concat(vehicles.slice(0,3)).slice(0,3).map(card).join("");
+  const cx=$("countTxt");if(cx)cx.textContent=`Exibindo: ${list.length} de ${vehicles.length} Veículos disponíveis`;
+  const dg=$("destaqueGrid");if(dg)dg.innerHTML=vehicles.filter(x=>x.super).concat(vehicles.slice(0,3)).slice(0,3).map(card).join("");
   bindCards();
-  if($("favCount"))$("favCount").textContent=favs.size;
+  const fc=$("favCount");if(fc)fc.textContent=favs.size;
   // hover touch: passar dedo ativa cor preta
   document.querySelectorAll(".card").forEach(c=>{
     c.addEventListener("touchstart",()=>{document.querySelectorAll(".card.touch-hover").forEach(x=>x!==c&&x.classList.remove("touch-hover"));c.classList.add("touch-hover")},{passive:true});
@@ -119,33 +132,29 @@ function bindCards(){
 }
 function openDet(code){
   const v=vehicles.find(x=>x.code===code);if(!v)return;
-  $("detBody").innerHTML=`<div class="det-grid"><div><img src="${v.img}"><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><span class="badge" style="position:static">${v.state}</span>${v.tag?`<span class="badge oferta" style="position:static">${v.tag}</span>`:""}</div></div>
+  const db=$("detBody");if(!db)return;db.innerHTML=`<div class="det-grid"><div><img src="${v.img}"><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><span class="badge" style="position:static">${v.state}</span>${v.tag?`<span class="badge oferta" style="position:static">${v.tag}</span>`:""}</div></div>
   <div><span class="code">Código ${v.code}</span><h2>${v.brand} ${v.model}</h2><p>${v.version}</p>
   <div class="price" style="font-size:28px;margin:8px 0">${fmt(v.price)}</div>
   <p>📅 ${v.year} • 🛣️ ${v.km.toLocaleString("pt-BR")} km<br>⛽ ${v.fuel} • ⚙️ ${v.gear}<br>📍 BR Car Multimarcas – BR-116, 13205, Caxias do Sul</p>
   <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><a class="btn-red" target="_blank" href="https://wa.me/${WA}?text=${encodeURIComponent("Olá! Tenho interesse no "+v.brand+" "+v.model+" "+v.version+" código "+v.code+". Ainda está disponível?")}">Tenho interesse</a>
   <button class="btn-outline" onclick="document.getElementById('ovDet').classList.remove('open')">Fechar</button></div></div></div>`;
-  $("ovDet").classList.add("open");document.body.style.overflow="hidden";
+  const od=$("ovDet");if(od){od.classList.add("open");document.body.style.overflow="hidden";}
 }
 // eventos filtros - formato print
-function syncModeloOptions(){
-  const marca=$("fMarca").value;
-  const modelos=[...new Set(vehicles.filter(v=>marca==="todas"||v.brand===marca).map(v=>v.model))];
-  $("fModelo").innerHTML='<option value="todos">Mostrar Todos</option>'+modelos.map(m=>`<option>${m}</option>`).join("");
-}
+
 ["fCodigo","fMarca","fModelo","fVersao","fValor","fKm","fCambio","fComb","fCarro","fOrdem","fFav","fSuper"].forEach(id=>{const el=$(id);if(el)el.addEventListener("input",()=>{if(id==="fMarca")syncModeloOptions();applyFilters()})});
 document.querySelectorAll(".fEst,.fEtiq").forEach(x=>x.addEventListener("change",applyFilters));
 const fTop=$("fBuscaTop");if(fTop){fTop.addEventListener("input",()=>{$("fBusca").value=fTop.value;applyFilters()});fTop.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();applyFilters()}})}
 const btnTop=$("btnBuscarTop");if(btnTop)btnTop.onclick=()=>{$("fBusca").value=fTop.value;applyFilters();document.getElementById("vehicleGrid").scrollIntoView({behavior:"smooth"})};
 const btnCod=$("btnCod");if(btnCod)btnCod.onclick=()=>{applyFilters();toast("Buscando código "+$("fCodigo").value)};
 const clearAll=()=>{$("fCodigo").value="";if(fTop)fTop.value="";$("fBusca").value="";$("fMarca").value="todas";syncModeloOptions();$("fModelo").value="todos";$("fVersao").value="todas";$("fValor").value=$("fValor").max;$("fKm").value=$("fKm").max;$("fCambio").value="todos";$("fComb").value="todos";$("fCarro").value="todas";$("fFav").checked=false;$("fSuper").checked=false;document.querySelectorAll(".fEst").forEach(x=>x.checked=(x.value!=="Zero Km"));document.querySelectorAll(".fEtiq").forEach(x=>x.checked=false);document.querySelectorAll(".brand-chip").forEach(x=>x.classList.remove("on"));applyFilters();toast("Filtros limpos")};
-$("clearFilters").onclick=clearAll;
+const cf=$("clearFilters");if(cf)cf.onclick=clearAll;
 const btnTopo=$("btnLimparTopo");if(btnTopo)btnTopo.onclick=clearAll;
 const btnBuscar=$("btnBuscar");if(btnBuscar)btnBuscar.onclick=()=>{applyFilters();document.getElementById("vehicleGrid").scrollIntoView({behavior:"smooth",block:"start"});toast("Busca aplicada")};
 const verTodas=$("verTodasMarcas");if(verTodas)verTodas.onclick=e=>{e.preventDefault();clearAll();document.getElementById("estoque").scrollIntoView({behavior:"smooth"})};
-$("linkFavs").onclick=e=>{e.preventDefault();$("fFav").checked=true;applyFilters();document.getElementById("estoque").scrollIntoView({behavior:"smooth"});toast(favs.size?favs.size+" favorito(s)":"Você ainda não tem favoritos — clique no ♡")};
+const lf=$("linkFavs");if(lf)lf.onclick=e=>{e.preventDefault();$("fFav").checked=true;applyFilters();document.getElementById("estoque").scrollIntoView({behavior:"smooth"});toast(favs.size?favs.size+" favorito(s)":"Você ainda não tem favoritos — clique no ♡")};
 // menu mobile
-$("menuToggle").onclick=()=>$("mobileNav").classList.toggle("open");
+const mt2=$("menuToggle"),mn=$("mobileNav");if(mt2&&mn)mt2.onclick=()=>mn.classList.toggle("open");
 document.querySelectorAll("#mobileNav a").forEach(a=>a.addEventListener("click",()=>$("mobileNav").classList.remove("open")));
 // modais
 const openSim=()=>{$("ovSim").classList.add("open");document.body.style.overflow="hidden"};
@@ -166,23 +175,26 @@ function heroAuto(){clearInterval(heroTimer);heroTimer=setInterval(()=>heroShow(
   const slides=document.querySelectorAll(".hero-slide"),dotsBox=$("heroDots");if(!slides.length||!dotsBox)return;
   dotsBox.innerHTML=[...slides].map((_,i)=>`<button aria-label="Slide ${i+1}" data-d="${i}"></button>`).join("");
   dotsBox.querySelectorAll("button").forEach(d=>d.onclick=()=>{heroShow(+d.dataset.d);heroAuto()});
-  $("heroPrev").onclick=()=>{heroShow(heroIdx-1);heroAuto()};
-  $("heroNext").onclick=()=>{heroShow(heroIdx+1);heroAuto()};
-  const sec=$("heroSlider");sec.addEventListener("mouseenter",()=>clearInterval(heroTimer));sec.addEventListener("mouseleave",heroAuto);
+  const hp=$("heroPrev");if(hp)hp.onclick=()=>{heroShow(heroIdx-1);heroAuto()};
+  const hn=$("heroNext");if(hn)hn.onclick=()=>{heroShow(heroIdx+1);heroAuto()};
+  const sec=$("heroSlider");if(sec){sec.addEventListener("mouseenter",()=>clearInterval(heroTimer));sec.addEventListener("mouseleave",heroAuto)}
   heroShow(0);heroAuto();
 })();
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>{b.closest(".overlay").classList.remove("open");document.body.style.overflow=""});
 document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o){o.classList.remove("open");document.body.style.overflow=""}}));
 document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".overlay.open").forEach(o=>{o.classList.remove("open");document.body.style.overflow=""})});
 // simulador Price com 1,49% a.m.
-$("sCalc").onclick=()=>{
-  const V=+$("sValor").value||0,E=+$("sEntrada").value||0,N=+$("sN").value||36,fin=V-E,i=0.0149;
-  if(fin<=0){$("sRes").textContent="A entrada não pode ser maior que o valor.";return}
+const sc=$("sCalc");
+if(sc)sc.onclick=()=>{
+  const V=parseFloat(val("sValor","0"))||0,E=parseFloat(val("sEntrada","0"))||0,N=parseInt(val("sN","36"))||36,fin=V-E,i=0.0149;
+  const sr=$("sRes");
+  if(fin<=0){if(sr)sr.textContent="A entrada não pode ser maior que o valor.";return}
   const p=fin*i/(1-Math.pow(1+i,-N));
-  $("sRes").innerHTML=`Financiado: <strong>${fmt(fin)}</strong><br>${N}x de <strong>${fmt(p)}</strong> (1,49% a.m. estimado)<br><small>Simulação aproximada. Fale com a loja para condições reais.</small>`;
-  $("sWa").href=`https://wa.me/${WA}?text=${encodeURIComponent("Olá! Simulei no site: veículo de "+fmt(V)+", entrada "+fmt(E)+", "+N+"x de "+fmt(p)+". Quero uma proposta!")}`;
+  if(sr)sr.innerHTML=`Financiado: <strong>${fmt(fin)}</strong><br>${N}x de <strong>${fmt(p)}</strong> (1,49% a.m. estimado)<br><small>Simulação aproximada. Fale com a loja para condições reais.</small>`;
+  const sw=$("sWa");
+  if(sw)sw.href=`https://wa.me/${WA}?text=${encodeURIComponent("Olá! Simulei no site: veículo de "+fmt(V)+", entrada "+fmt(E)+", "+N+"x de "+fmt(p)+". Quero uma proposta!")}`;
 };
 // reveal
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add("vis")}),{threshold:.12});
 document.querySelectorAll(".reveal,.card").forEach(el=>io.observe(el));
-(function(){try{var mp=Math.max.apply(null,vehicles.map(function(v){return v.price}));var mx=Math.ceil((mp+1)/10000)*10000;var sv=$("fValor");sv.max=mx;sv.value=mx;var mk=Math.max.apply(null,vehicles.map(function(v){return v.km}));var kx=Math.max(Math.ceil((mk+1)/5000)*5000,50000);var sk=$("fKm");sk.max=kx;sk.value=kx;}catch(e){}})();renderBrands();syncModeloOptions();applyFilters();
+(function(){try{var mp=Math.max.apply(null,vehicles.map(function(v){return v.price}));var mx=Math.ceil((mp+1)/10000)*10000;var sv=$("fValor");sv.max=mx;sv.value=mx;var mk=Math.max.apply(null,vehicles.map(function(v){return v.km}));var kx=Math.max(Math.ceil((mk+1)/5000)*5000,50000);var sk=$("fKm");sk.max=kx;sk.value=kx;}catch(e){}})();try{renderBrands()}catch(e){}try{syncModeloOptions()}catch(e){}try{applyFilters()}catch(e){try{const vg=$("vehicleGrid");if(vg)vg.innerHTML=vehicles.map(card).join("")}catch(_){}}
