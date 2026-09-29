@@ -24,8 +24,8 @@ const vehicles=[
 ];
 const brands=["Fiat","Hyundai","Nissan","Peugeot","Honda","Citroen","Renault","Volkswagen","Ford","Chevrolet","Jeep","Toyota"];
 const brandDomains={Fiat:"fiat.com",Hyundai:"hyundai.com",Nissan:"nissan-global.com",Peugeot:"peugeot.com",Honda:"honda.com",Citroen:"citroen.com",Renault:"renault.com",Volkswagen:"vw.com",Ford:"ford.com",Chevrolet:"chevrolet.com",Jeep:"jeep.com",Toyota:"toyota.com",Polaris:"polaris.com",Lifan:"lifan.com"};
-const logoURL=b=>`https://logo.clearbit.com/${brandDomains[b]}?size=128`;
-let favs=new Set(JSON.parse(localStorage.getItem("brcar_favs")||"[]"));
+const logoURL=b=>`https://logo.clearbit.com/${brandDomains[b]}?size=128`;function slugOf(b){var m={"Mercedes-Benz":"mercedes","Land Rover":"landrover","Harley-Davidson":"harleydavidson"};return m[b]||b.toLowerCase().replace(/[^a-z0-9]/g,"")}
+let favs=new Set();try{favs=new Set(JSON.parse(localStorage.getItem("brcar_favs")||"[]"))}catch(e){favs=new Set()}
 let estadoFiltro="todos";
 
 const $=id=>document.getElementById(id);
@@ -34,7 +34,7 @@ const fmt=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL",maximumFr
 function toast(m){const t=$("toast");t.textContent=m;t.style.display="block";clearTimeout(t._x);t._x=setTimeout(()=>t.style.display="none",2600)}
 
 function renderBrands(){
-  $("brandsRow").innerHTML=brands.map(b=>`<div class="brand-chip" data-b="${b}" role="button" tabindex="0" title="Filtrar ${b}"><img loading="lazy" src="${logoURL(b)}" alt="Logo ${b}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="fallback">${b[0]}</span>${b}</div>`).join("");
+  $("brandsRow").innerHTML=brands.map(b=>`<div class="brand-chip" data-b="${b}" role="button" tabindex="0" title="Filtrar ${b}"><img loading="lazy" src="${logoURL(b)}" data-slug="${slugOf(b)}" alt="Logo ${b}" onerror="if(!this.dataset.f1){this.dataset.f1=1;this.src='https://cdn.simpleicons.org/'+this.dataset.slug}else{this.style.display='none';this.nextElementSibling.style.display='flex'}"><span class="fallback">${b[0]}</span>${b}</div>`).join("");
   const filterBy=b=>{$("fMarca").value=b;document.querySelectorAll(".brand-chip").forEach(x=>x.classList.toggle("on",x.dataset.b===b));applyFilters();document.getElementById("estoque").scrollIntoView({behavior:"smooth"});toast("Filtrando: "+b)};
   document.querySelectorAll(".brand-chip").forEach(c=>{c.onclick=()=>filterBy(c.dataset.b);c.onkeydown=e=>{if(e.key==="Enter")filterBy(c.dataset.b)}});
   $("dropMarcas").innerHTML=brands.map(b=>`<a href="#estoque" data-b="${b}">${b}</a>`).join("");
@@ -113,7 +113,7 @@ function applyFilters(){
 }
 function bindCards(){
   document.querySelectorAll("[data-fav]").forEach(b=>b.onclick=e=>{e.stopPropagation();const c=b.dataset.fav;
-    favs.has(c)?favs.delete(c):favs.add(c);localStorage.setItem("brcar_favs",JSON.stringify([...favs]));applyFilters();toast(favs.has(c)?"Adicionado aos favoritos ❤":"Removido dos favoritos")});
+    favs.has(c)?favs.delete(c):favs.add(c);try{localStorage.setItem("brcar_favs",JSON.stringify([...favs]))}catch(e){};applyFilters();toast(favs.has(c)?"Adicionado aos favoritos ❤":"Removido dos favoritos")});
   document.querySelectorAll("[data-det]").forEach(b=>b.onclick=()=>openDet(b.dataset.det));
   document.querySelectorAll("[data-det-img]").forEach(d=>d.onclick=e=>{if(e.target.closest("[data-fav]"))return;openDet(d.dataset.detImg)});
 }
@@ -138,7 +138,7 @@ document.querySelectorAll(".fEst,.fEtiq").forEach(x=>x.addEventListener("change"
 const fTop=$("fBuscaTop");if(fTop){fTop.addEventListener("input",()=>{$("fBusca").value=fTop.value;applyFilters()});fTop.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();applyFilters()}})}
 const btnTop=$("btnBuscarTop");if(btnTop)btnTop.onclick=()=>{$("fBusca").value=fTop.value;applyFilters();document.getElementById("vehicleGrid").scrollIntoView({behavior:"smooth"})};
 const btnCod=$("btnCod");if(btnCod)btnCod.onclick=()=>{applyFilters();toast("Buscando código "+$("fCodigo").value)};
-const clearAll=()=>{$("fCodigo").value="";if(fTop)fTop.value="";$("fBusca").value="";$("fMarca").value="todas";syncModeloOptions();$("fModelo").value="todos";$("fVersao").value="todas";$("fValor").value=129000;$("fKm").value=189000;$("fCambio").value="todos";$("fComb").value="todos";$("fCarro").value="todas";$("fFav").checked=false;$("fSuper").checked=false;document.querySelectorAll(".fEst").forEach(x=>x.checked=(x.value!=="Zero Km"));document.querySelectorAll(".fEtiq").forEach(x=>x.checked=false);document.querySelectorAll(".brand-chip").forEach(x=>x.classList.remove("on"));applyFilters();toast("Filtros limpos")};
+const clearAll=()=>{$("fCodigo").value="";if(fTop)fTop.value="";$("fBusca").value="";$("fMarca").value="todas";syncModeloOptions();$("fModelo").value="todos";$("fVersao").value="todas";$("fValor").value=$("fValor").max;$("fKm").value=$("fKm").max;$("fCambio").value="todos";$("fComb").value="todos";$("fCarro").value="todas";$("fFav").checked=false;$("fSuper").checked=false;document.querySelectorAll(".fEst").forEach(x=>x.checked=(x.value!=="Zero Km"));document.querySelectorAll(".fEtiq").forEach(x=>x.checked=false);document.querySelectorAll(".brand-chip").forEach(x=>x.classList.remove("on"));applyFilters();toast("Filtros limpos")};
 $("clearFilters").onclick=clearAll;
 const btnTopo=$("btnLimparTopo");if(btnTopo)btnTopo.onclick=clearAll;
 const btnBuscar=$("btnBuscar");if(btnBuscar)btnBuscar.onclick=()=>{applyFilters();document.getElementById("vehicleGrid").scrollIntoView({behavior:"smooth",block:"start"});toast("Busca aplicada")};
@@ -185,4 +185,4 @@ $("sCalc").onclick=()=>{
 // reveal
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add("vis")}),{threshold:.12});
 document.querySelectorAll(".reveal,.card").forEach(el=>io.observe(el));
-renderBrands();syncModeloOptions();applyFilters();
+(function(){try{var mp=Math.max.apply(null,vehicles.map(function(v){return v.price}));var mx=Math.ceil((mp+1)/10000)*10000;var sv=$("fValor");sv.max=mx;sv.value=mx;var mk=Math.max.apply(null,vehicles.map(function(v){return v.km}));var kx=Math.max(Math.ceil((mk+1)/5000)*5000,50000);var sk=$("fKm");sk.max=kx;sk.value=kx;}catch(e){}})();renderBrands();syncModeloOptions();applyFilters();
